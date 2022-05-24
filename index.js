@@ -28,20 +28,27 @@ app.get("/api/hello", function (req, res) {
 app.get("/api/:date?", (req, res) => {
   //if regexIsUnix(req.params.date), convert
   const unixRegex = /\d{5,}/;
+  let checkDate = new Date(req.params.date);
 
   if(unixRegex.test(req.params.date)) {
-    let dateTime = new Date(parseInt(req.params.date));
-    res.json({unix: req.params.date, utc: dateTime.toUTCString()});
+    let dateInt = parseInt(req.params.date);
+    let dateTime = new Date(dateInt);
+    res.json({unix: dateInt, utc: dateTime.toUTCString()});
 
-  } else if(!req.params.date) {
-    let rightNow = new Date();
-    res.json({unix: Date.now(), utc: rightNow.toUTCString()});
+  } else if (checkDate.toString() === "Invalid Date"){
 
+      if(!req.params.date) {
+        let rightNow = new Date();
+        res.json({unix: Date.now(), utc: rightNow.toUTCString()});
+
+      } else {
+        res.json({error: "Invalid Date"});
+      };
   } else {
       const dateObject = new Date(req.params.date);
       res.json({unix: dateObject.getTime(), utc: dateObject.toUTCString()});
-    }
-})
+    };
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
